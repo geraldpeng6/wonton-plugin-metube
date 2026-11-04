@@ -1,57 +1,67 @@
-# 示例插件：nginx 显示一个网页，向登录的人问好。照着 README 的“写插件”换成你的应用。
+# MeTube 视频下载：yt-dlp 的网页前端，文件写进共享文件夹 downloads。
+# 上游 ghcr.io/alexta69/metube，AGPL-3.0-only，镜像按清单列表（index）的摘要固定。
+# 镜像不依赖 root：入口脚本检测到非 root 用户时直接按容器用户运行（PUID/PGID 只在 root 时生效）。
 services:
-  web:
-    # 镜像按摘要固定（多架构镜像写清单列表的摘要），标签只给人看。
-    image: nginx:1.30.6-alpine@sha256:0e52bd054126cdc040b1276c0af347aeb02a41b9cfe305d6094767ac30e97949
-    # 包里的文件经 configs 交给容器（核心在启动前写进去），不能用卷挂载。
-    configs:
-      - source: site
-        target: /etc/nginx/conf.d/default.conf
-      - source: page
-        target: /usr/share/nginx/html/index.html
+  metube:
+    image: ghcr.io/alexta69/metube:2026.11.01@sha256:a97f455f4b56044debe1a5ce31ff01a9cb20e9e36322ba04f8dd2bb0539b9ec7
+    user: "${PUID}:${PGID}"
+    # 临时目录和状态目录独立出来，共享文件夹里只留下载的文件。
+    environment:
+      DOWNLOAD_DIR: /downloads
+      STATE_DIR: /data/.metube
+      TEMP_DIR: /data/tmp
+      # 上游默认 auto（跟随浏览器深浅色），不用改；界面无多语言，固定英文，见 README。
+      TZ: ${TZ}
+    volumes:
+      - ${WONTON_SHARE_DOWNLOADS}:/downloads
+      - ${WONTON_APP_DATA}/data:/data
     healthcheck:
-      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1/healthz"]
+      # 镜像自带的健康检查命令是 curl；这里显式写全，检查的是网页真的能响应。
+      test: ["CMD", "curl", "--fail", "--silent", "--show-error", "http://127.0.0.1:8081/"]
       interval: 30s
       timeout: 5s
       start_period: 30s
       start_interval: 1s
 
-configs:
-  site:
-    file: web/default.conf
-  page:
-    file: web/index.html
-
 x-wonton:
   spec: "0.4"
-  # 换成你自己的：反向域名形式，装上以后不能改。
-  id: app.example.hello
+  id: app.github.alexta69.metube
   version: 0.1.0
   kind: app
-  title: { zh: 你好, en: Hello }
-  description: { zh: 向登录的人问好的示例网页, en: An example page that greets whoever is signed in }
-  icon: icon.svg
+  title: { en: MeTube }
+  description: { zh: 把网页视频下载到你的共享文件夹, en: Download videos from the web into your shared folder }
+  icon: icon.png
   notices: [NOTICE]
-  category: tools
   screenshots: [screenshots/home.png]
-  author: { name: Example }
-  homepage: https://nginx.org
-  # 应用（这里是 nginx）的许可证；插件包自己的许可证写在仓库的 LICENSE 里。
-  license: BSD-2-Clause
-  tags: [示例, example]
+  author: { name: geraldpeng6, url: https://github.com/geraldpeng6 }
+  homepage: https://github.com/alexta69/metube
+  # 应用（MeTube）的许可证；插件包自己的许可证写在仓库的 LICENSE 里。
+  license: AGPL-3.0-only
+  tags:
+    zh: [下载, 视频]
+    en: [Download, Video]
   about:
     zh: |
-      插件模板里的示例：网关认出主人后，经请求头把用户名交给应用，网页上就是“你好，<用户名>”。
+      yt-dlp 的网页前端：贴上视频或播放列表的网址就能下载，文件直接落在共享文件夹 downloads 里，其他应用（Jellyfin、文件管理）都能读到。
+
+      支持几百个网站，可选画质和格式（视频、纯音频），下载队列和进度都在网页上看。打开就用，不用再登录一次；外网的下载站需要能访问。
     en: |
-      The example from the plugin template: once the gateway recognises the owner, it passes the user name to
-      the app in a request header, and the page says hello to them.
+      A web frontend for yt-dlp: paste a video or playlist URL and download it straight into the shared folder, where other apps (Jellyfin, file manager) can read it.
+
+      Hundreds of sites are supported, with quality and format options (video or audio-only); the queue and progress show on the page. Opening it is enough, there is no second login. Downloading needs internet access.
   release_notes: { zh: 第一版。, en: First release. }
   webui:
-    service: web
-    port: 80
-    # 应用不认 OIDC 时，由网关在请求上加上用户名（README 的“网页入口和登录”）。
-    sso: proxy
-    proxy:
-      headers:
-        Remote-User: "{user}"
-  permissions: []
+    service: metube
+    port: 8081
+    # 上游没有登录，也不认 OIDC 或反向代理头；sso: none 时网关仍先校验云吞会话才转发。
+    sso: none
+  permissions:
+    # 下载就是从外网拉视频。
+    - network.egress
+    # 下载的文件写进共享文件夹 downloads，其他应用和主人都能读。
+    - storage.share.downloads:write
+  # 镜像支持 amd64 和 arm64（docker buildx imagetools inspect）。上游没写最低内存；
+  # 本机空闲实测 124M（2026-11-05，一个 19 秒视频下载完成后），取 256M 留并发余量。
+  requirements:
+    arch: [amd64, arm64]
+    memory: 256M
