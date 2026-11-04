@@ -60,6 +60,8 @@ x-wonton:
     - network.egress
     # 下载的文件写进共享文件夹 downloads，其他应用和主人都能读。
     - storage.share.downloads:write
-  # 镜像支持 amd64 和 arm64（docker buildx imagetools inspect）；上游没写最低内存，本机空闲实测待补。
+  # 镜像支持 amd64 和 arm64（docker buildx imagetools inspect）。上游没写最低内存；
+  # 本机空闲实测 124M（2026-11-05，一个 19 秒视频下载完成后），取 256M 留并发余量。
   requirements:
     arch: [amd64, arm64]
+    memory: 256M
