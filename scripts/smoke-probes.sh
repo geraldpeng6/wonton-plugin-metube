@@ -7,4 +7,7 @@
 web_assert() { grep -qi 'metube'; }   # stdin：应用真实页面
 
 IDENTITY_NA=1
-SMOKE_NOTE="MeTube 无账号体系（网关把关），身份项 N/A；"
+# MeTube 自身不持久化任何数据：下载队列在内存里，成品文件直接写进主人的 downloads 共享目录，
+# 插件没有自己的存储（清单也没有 WONTON_APP_DATA 卷），升级/重装两项记 N/A。
+DATA_NA=1
+SMOKE_NOTE="MeTube 无账号体系（网关把关），身份项 N/A；应用自身不持久化（队列在内存，成品进 downloads 共享目录），数据两项 N/A。"
