@@ -3,7 +3,7 @@
 # 镜像不依赖 root：入口脚本检测到非 root 用户时直接按容器用户运行（PUID/PGID 只在 root 时生效）。
 services:
   metube:
-    image: ghcr.io/alexta69/metube:2026.11.06@sha256:96dfbf0d5b2944e4ee38f6ce1b34bb0e75a1a3c74eaefd93424ed11284cb72b2
+    image: ghcr.io/alexta69/metube:2026.11.10@sha256:6654866e76eab4228530dc5ed828ccfd702d1ee810feab2d629028272b399e14
     user: "${PUID}:${PGID}"
     # 临时目录和状态目录独立出来，共享文件夹里只留下载的文件。
     environment:
