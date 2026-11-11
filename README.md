@@ -1,6 +1,6 @@
 # MeTube 云吞插件
 
-开发流程见[插件开发指南](https://github.com/geraldpeng6/wonton-docs/blob/main/develop.md)。
+开发流程见[插件开发指南](https://github.com/wontonapp/wonton-docs/blob/main/develop.md)。
 
 [MeTube](https://github.com/alexta69/metube) 的云吞插件（应用许可证 AGPL-3.0-only）：yt-dlp 的网页前端，把网页视频下载到
 共享文件夹 `downloads`。网页保留 MeTube 自己的界面（无登录），同时受云吞网关保护；上游界面只有英文，没有多语言。
