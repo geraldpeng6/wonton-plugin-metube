@@ -28,8 +28,8 @@ x-wonton:
   id: app.github.alexta69.metube
   version: 0.1.0
   kind: app
-  title: { en: MeTube }
-  description: { zh: 把网页视频下载到你的共享文件夹, en: Download videos from the web into your shared folder }
+  title: { zh: 视频下载器（MeTube）, en: Video Downloader (MeTube) }
+  description: { zh: 贴一个视频网址，它就把视频下载到共享文件夹 downloads：支持几百个网站，能选画质，也能只要声音。适合看到好视频想随手存一个的人。, en: "Paste a video link and it saves the video to the downloads shared folder on your home server — hundreds of sites supported, with a choice of quality or audio only. For saving a video you like, one at a time." }
   icon: icon.png
   notices: [NOTICE]
   screenshots: [screenshots/home.png]
@@ -42,11 +42,11 @@ x-wonton:
     en: [Download, Video]
   about:
     zh: |
-      yt-dlp 的网页前端：贴上视频或播放列表的网址就能下载，文件直接落在共享文件夹 downloads 里，其他应用（Jellyfin、文件管理）都能读到。
+      贴上视频或播放列表的网址就能下载，文件直接存进共享文件夹 downloads，其他应用（家庭影院、文件管理）都能读到。
 
       支持几百个网站，可选画质和格式（视频、纯音频），下载队列和进度都在网页上看。打开就用，不用再登录一次；外网的下载站需要能访问。
     en: |
-      A web frontend for yt-dlp: paste a video or playlist URL and download it straight into the shared folder, where other apps (Jellyfin, file manager) can read it.
+      Paste a video or playlist link to download it straight into the downloads shared folder, where other apps (Jellyfin, the file manager) can read it.
 
       Hundreds of sites are supported, with quality and format options (video or audio-only); the queue and progress show on the page. Opening it is enough, there is no second login. Downloading needs internet access.
   release_notes: { zh: 第一版。, en: First release. }
